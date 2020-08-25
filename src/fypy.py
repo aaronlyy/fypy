@@ -102,7 +102,7 @@ class TokenResponse():
 
 if __name__ == "__main__":
     # create a connection
-    fypy = FyPy("8583112c962541b7ba7b324aba4adb81", "cfca632aeaee43b7af97111d0ed59b27")
+    fypy = FyPy("8583112c962541aba4adb81", "cfca632aeaee4ed59b27")
     # build a authorization url with given scopes
     print(fypy.build_authorization_url("https://8bdbb8ef4d82.ngrok.io", ["user-follow-modify"]))
     # request an access_token
