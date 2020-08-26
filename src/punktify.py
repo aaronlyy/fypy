@@ -8,7 +8,7 @@ This is a very simple and basic API Wrapper for the Spotify Web API.
 import requests # pip install requests
 
 
-class FyPy():
+class Punktify():
     '''
     Create a new connection to the Spotify Web API using your client_id, client_secret and redirect_url.
     (Can be found on your Developer Dashboard.)
@@ -102,12 +102,12 @@ class TokenResponse():
 
 if __name__ == "__main__":
     # create a connection
-    fypy = FyPy("8583112c962541aba4adb81", "cfca632aeaee4ed59b27")
+    pf = Punktify("8583112c962541aba4adb81", "cfca632aeaee4ed59b27")
     # build a authorization url with given scopes
-    print(fypy.build_authorization_url("https://8bdbb8ef4d82.ngrok.io", ["user-follow-modify"]))
+    print(pf.build_authorization_url("https://8bdbb8ef4d82.ngrok.io", ["user-follow-modify"]))
     # request an access_token
     code = input("\nauth code: ")
-    tokenres = fypy.request_access_token(code, "https://8bdbb8ef4d82.ngrok.io")
+    tokenres = pf.request_access_token(code, "https://8bdbb8ef4d82.ngrok.io")
     if tokenres.status_code == 200:
         print(tokenres.access_token)
     else:
