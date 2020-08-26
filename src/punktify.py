@@ -79,6 +79,9 @@ class Punktify():
     def set_access_token(self):
         pass
     
+
+     # -------------------------------------------------------
+
     def get_current_user_profile(self, access_token):
         '''
         This function returns all information about the currently logged in user
