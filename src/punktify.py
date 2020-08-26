@@ -70,13 +70,29 @@ class Punktify():
         url = "https://accounts.spotify.com/api/token"
 
         response = requests.post(url, data=data)
+        return PunktifyResponse(response)
+    
+    def auth(self, authorization_code, redirect_uri, refresh=False):
+        access_response = self.request_access_token(authorization_code, redirect_uri, refresh)
+        self.access_token = access_response.access_token
 
-        return TokenResponse(response)
+    def set_access_token(self):
+        pass
+    
+    def get_current_user_profile(self, access_token):
+        '''
+        This function returns all information about the currently logged in user
+        '''
+        headers = {"Authorization": "Bearer " + access_token}
+        url = "https://api.spotify.com/v1/me"
+        response = requests.get(url, headers=headers)
+        return PunktifyResponse(response)
 
+        
 
-class TokenResponse():
+class PunktifyResponse():
     '''
-    This class holds all the access information
+    Universal class for responses
     '''
     def __init__(self, response):
         self.jsonobj = response.json()
@@ -95,21 +111,16 @@ class TokenResponse():
         returns a dict like object that can be iterated (key, value) (.items(), .keys(), .values())
         '''
         return self.jsonobj
-            
-
 
 
 
 if __name__ == "__main__":
+    import webbrowser
     # create a connection
-    pf = Punktify("8583112c962541aba4adb81", "cfca632aeaee4ed59b27")
+    pf = Punktify("8583112c962541b7ba7b324aba4adb81", "cfca632aeaee43b7af97111d0ed59b27")
     # build a authorization url with given scopes
-    print(pf.build_authorization_url("https://8bdbb8ef4d82.ngrok.io", ["user-follow-modify"]))
-    # request an access_token
-    code = input("\nauth code: ")
-    tokenres = pf.request_access_token(code, "https://8bdbb8ef4d82.ngrok.io")
-    if tokenres.status_code == 200:
-        print(tokenres.access_token)
-    else:
-        for k, v in tokenres.iter().items():
-            print(k, v)
+    webbrowser.open(pf.build_authorization_url("https://punktify.herokuapp.com/callback", ["user-follow-modify"]))
+    access_token = input("access_token: ")
+    user = pf.get_current_user_profile(access_token)
+    for k, v in user.iter().items():
+        print(k, v)
