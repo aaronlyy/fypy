@@ -17,7 +17,7 @@ class Punktify():
         self.client_id = client_id
         self.client_secret = client_secret
 
-        # create a access_token variable with type None to check if a authorization has been made or not
+        # access stuff
         self.access_token = None
 
 
@@ -52,8 +52,8 @@ class Punktify():
 
     def request_access_token(self, authorization_code, redirect_uri, refresh=False):
         '''
-        This function taken a authorization_code and requests an access token from it.
-        if refresh is set to True, it requests an new access token using the refresh token.
+        This function takes a authorization_code and requests an access token from it.
+        If refresh is set to True, it requests an new access token using the refresh token.
         '''
         if refresh:
             grant_type = "refresh_token"
@@ -68,8 +68,8 @@ class Punktify():
             "client_id": self.client_id
         }
         url = "https://accounts.spotify.com/api/token"
-
         response = requests.post(url, data=data)
+
         return PunktifyResponse(response)
     
     def auth(self, authorization_code, redirect_uri, refresh=False):
@@ -120,7 +120,7 @@ class PunktifyResponse():
 if __name__ == "__main__":
     import webbrowser
     # create a connection
-    pf = Punktify("8583112c962541b7ba7b324aba4adb81", "cfca632aeaee43b7af97111d0ed59b27")
+    pf = Punktify("8583112c962541b7ba7b324aba4adb81", "cfca632aeaee43b7af97111d0ed59b27") # secret changed, dont even think aboout it :D
     # build a authorization url with given scopes
     webbrowser.open(pf.build_authorization_url("https://punktify.herokuapp.com/callback", ["user-follow-modify"]))
     access_token = input("access_token: ")
