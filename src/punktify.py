@@ -69,25 +69,29 @@ class Punktify():
         }
         url = "https://accounts.spotify.com/api/token"
         response = requests.post(url, data=data)
-
         return PunktifyResponse(response)
     
     def auth(self, authorization_code, redirect_uri, refresh=False):
         access_response = self.request_access_token(authorization_code, redirect_uri, refresh)
         self.access_token = access_response.access_token
 
-    def set_access_token(self):
-        pass
-    
-
      # -------------------------------------------------------
 
-    def get_current_user_profile(self, access_token):
+    def get_current_user_profile(self):
         '''
         This function returns all information about the currently logged in user
         '''
-        headers = {"Authorization": "Bearer " + access_token}
+        headers = {"Authorization": "Bearer " + self.access_token}
         url = "https://api.spotify.com/v1/me"
+        response = requests.get(url, headers=headers)
+        return PunktifyResponse(response)
+    
+    def get_user_profile(self, user_id):
+        '''
+        This function returns all information about a user
+        '''
+        headers = {"Authorization": "Bearer " + self.access_token}
+        url = f"https://api.spotify.com/v1/users/{user_id}"
         response = requests.get(url, headers=headers)
         return PunktifyResponse(response)
 
@@ -116,14 +120,13 @@ class PunktifyResponse():
         return self.jsonobj
 
 
-
 if __name__ == "__main__":
     import webbrowser
     # create a connection
-    pf = Punktify("8583112c962541b7ba7b324aba4adb81", "cfca632aeaee43b7af97111d0ed59b27") # secret changed, dont even think aboout it :D
+    pf = Punktify("8583112c962541b7ba7b324aba4adb81", "98a6bbfd7a5540a6ad50b7b59841440b") # secret changed, dont even think aboout it :D
     # build a authorization url with given scopes
     webbrowser.open(pf.build_authorization_url("https://punktify.herokuapp.com/callback", ["user-follow-modify"]))
-    access_token = input("access_token: ")
-    user = pf.get_current_user_profile(access_token)
-    for k, v in user.iter().items():
-        print(k, v)
+    auth_code = input("code: ")
+    pf.auth(auth_code, "https://punktify.herokuapp.com/callback")
+    
+
