@@ -6,6 +6,7 @@ This is a very simple and basic API Wrapper for the Spotify Web API.
 '''
 
 import requests # pip install requests
+import json
 
 
 class Punktify():
@@ -19,6 +20,7 @@ class Punktify():
 
         # access stuff
         self.access_token = None
+        self.user_id = None
 
 
     def build_authorization_url(self, redirect_uri, scopes=[]):
@@ -74,6 +76,7 @@ class Punktify():
     def auth(self, authorization_code, redirect_uri, refresh=False):
         access_response = self.request_access_token(authorization_code, redirect_uri, refresh)
         self.access_token = access_response.access_token
+        self.user_id = self.get_current_user_profile().id
 
      # -------------------------------------------------------
 
@@ -94,6 +97,34 @@ class Punktify():
         url = f"https://api.spotify.com/v1/users/{user_id}"
         response = requests.get(url, headers=headers)
         return PunktifyResponse(response)
+    
+    def create_public_playlist(self, name, description=""):
+        '''
+        this function creates a public playlist
+        '''
+        headers = {"Authorization": "Bearer " + self.access_token}
+        data = {
+            "name": name,
+            "description": description,
+            "public": True
+            }
+        url = f"https://api.spotify.com/v1/users/{self.user_id}/playlists"
+        response = requests.post(url, data=json.dumps(data), headers=headers)
+        return PunktifyResponse(response)
+    
+    def create_private_playlist(self, name, description=""):
+        '''
+        this function creates a public playlist
+        '''
+        headers = {"Authorization": "Bearer " + self.access_token}
+        data = {
+            "name": name,
+            "description": description,
+            "public": False
+            }
+        url = f"https://api.spotify.com/v1/users/{self.user_id}/playlists"
+        response = requests.post(url, data=json.dumps(data), headers=headers)
+        return PunktifyResponse(response)
 
         
 
@@ -113,7 +144,7 @@ class PunktifyResponse():
         else:
             return None
     
-    def iter(self):
+    def json(self):
         '''
         returns a dict like object that can be iterated (key, value) (.items(), .keys(), .values())
         '''
@@ -125,8 +156,10 @@ if __name__ == "__main__":
     # create a connection
     pf = Punktify("8583112c962541b7ba7b324aba4adb81", "98a6bbfd7a5540a6ad50b7b59841440b") # secret changed, dont even think aboout it :D
     # build a authorization url with given scopes
-    webbrowser.open(pf.build_authorization_url("https://punktify.herokuapp.com/callback", ["user-follow-modify"]))
+    webbrowser.open(pf.build_authorization_url("https://punktify.herokuapp.com/callback", ["playlist-modify-public", "playlist-modify-private"]))
     auth_code = input("code: ")
     pf.auth(auth_code, "https://punktify.herokuapp.com/callback")
-    
+    print(pf.user_id)
+
+
 
