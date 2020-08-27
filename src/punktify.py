@@ -98,36 +98,36 @@ class Punktify():
         response = requests.get(url, headers=headers)
         return PunktifyResponse(response)
     
-    def create_public_playlist(self, name, description=""):
+    def create_new_playlist(self, name, description="", make_public=False):
         '''
         this function creates a public playlist
         '''
-        headers = {"Authorization": "Bearer " + self.access_token}
+        headers = {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
         data = {
             "name": name,
             "description": description,
-            "public": True
+            "public": make_public
             }
         url = f"https://api.spotify.com/v1/users/{self.user_id}/playlists"
-        response = requests.post(url, data=json.dumps(data), headers=headers)
-        return PunktifyResponse(response)
-    
-    def create_private_playlist(self, name, description=""):
-        '''
-        this function creates a public playlist
-        '''
-        headers = {"Authorization": "Bearer " + self.access_token}
-        data = {
-            "name": name,
-            "description": description,
-            "public": False
-            }
-        url = f"https://api.spotify.com/v1/users/{self.user_id}/playlists"
-        response = requests.post(url, data=json.dumps(data), headers=headers)
+        response = requests.post(url, headers=headers, data=json.dumps(data))
         return PunktifyResponse(response)
 
+    def add_items_to_playlist(self, playlist_id, uris=[], position=None):
+        '''
+        this functions adds items to a playlist, max 100 per request
+        '''
+        headers = {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
+        data = {
+            "uris": uris
+        }
+        if position != None: # add insert position if given
+            data["position"] = position
+        url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+        return PunktifyResponse(response)
         
-
+        
+        
 class PunktifyResponse():
     '''
     Universal class for responses
@@ -144,12 +144,18 @@ class PunktifyResponse():
         else:
             return None
     
+    def __repr__(self):
+        s = ""
+        for k, v in self.jsonobj.items():
+            s += f"{k}: {v}\n"
+        return s
+    
     def json(self):
         '''
         returns a dict like object that can be iterated (key, value) (.items(), .keys(), .values())
         '''
         return self.jsonobj
-
+    
 
 if __name__ == "__main__":
     import webbrowser
@@ -159,7 +165,9 @@ if __name__ == "__main__":
     webbrowser.open(pf.build_authorization_url("https://punktify.herokuapp.com/callback", ["playlist-modify-public", "playlist-modify-private"]))
     auth_code = input("code: ")
     pf.auth(auth_code, "https://punktify.herokuapp.com/callback")
-    print(pf.user_id)
+
+    
 
 
 
+# spotify:track:1RqpijoxxQJ9FWS1V56DeE
